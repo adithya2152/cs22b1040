@@ -1,20 +1,28 @@
 import { useEffect, useState } from 'react';
 import api from '../api';
 import PostCard from '../components/PostCard';
-import { Typography } from '@mui/material';
+import { Typography, Box, CircularProgress } from '@mui/material';
 
 const TrendingPosts = () => {
   const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/trending-posts').then(res => setPosts(res.data));
+    api.get('/posts?type=popular')
+      .then(res => setPosts(res.data.posts))
+      .catch(err => console.error("Error fetching trending posts:", err))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
-    <>
+    <Box sx={{ padding: 2 }}>
       <Typography variant="h5" gutterBottom>Trending Posts</Typography>
-      {posts.map((post, idx) => <PostCard key={idx} post={post} />)}
-    </>
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        posts.map((post, idx) => <PostCard key={idx} post={post} />)
+      )}
+    </Box>
   );
 };
 
